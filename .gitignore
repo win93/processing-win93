@@ -1,0 +1,13 @@
+.DS_Store
+.AppleDouble
+._*
+*~
+
+*.jar
+*.iml
+.idea/
+out/
+build/
+bin/
+target/
+
