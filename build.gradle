@@ -1,0 +1,26 @@
+plugins {
+	id "java"
+}
+
+group "dev.cadmium"
+version "1.0.0-SNAPSHOT"
+
+repositories {
+	mavenCentral()
+  maven { url "https://jitpack.io" }
+}
+
+dependencies {
+	def jogl_version = "2.3.2"
+
+	implementation "org.jogamp.gluegen:gluegen-rt-main:$jogl_version"
+	implementation "org.jogamp.jogl:jogl-all-main:$jogl_version"
+	implementation "org.jogamp.jogl:nativewindow-main:$jogl_version"
+	implementation "org.jogamp.jogl:newt-main:$jogl_version"
+
+	//Provide apple specific APIs and still compile on non macOS machines
+	 compileOnly "com.github.win93:OrangeExtensions:6672a058afd7dc06c667a590fd568f09a0e674a0"
+
+	//TODO: consider using junit jupiter instead
+//	testImplementation "junit:junit:4.12"
+}

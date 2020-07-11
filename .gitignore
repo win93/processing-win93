@@ -10,4 +10,5 @@ out/
 build/
 bin/
 target/
-
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
