@@ -3837,16 +3837,8 @@ public class PApplet implements PConstants {
       handleMethods("dispose");
     }
 
-    if (platform == MACOSX) {
-      try {
-        final String td = "processing.core.ThinkDifferent";
-        final Class<?> thinkDifferent = getClass().getClassLoader().loadClass(td);
-        thinkDifferent.getMethod("cleanup").invoke(null);
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    }
-
+    if (Platform.SUPPORTS_APPLE_EAWT)
+      ThinkDifferent.cleanup();
   }
 
 
@@ -10835,18 +10827,8 @@ public class PApplet implements PConstants {
       }
     }
 
-    if (platform == MACOSX) {
-      try {
-        final String td = "processing.core.ThinkDifferent";
-        Class<?> thinkDifferent =
-          Thread.currentThread().getContextClassLoader().loadClass(td);
-        Method method =
-          thinkDifferent.getMethod("init", new Class[] { PApplet.class });
-        method.invoke(null, new Object[] { sketch });
-      } catch (Exception e) {
-        e.printStackTrace();  // That's unfortunate
-      }
-    }
+    if (Platform.SUPPORTS_APPLE_EAWT)
+	    ThinkDifferent.init(sketch);
 
     // Set the suggested display that's coming from the command line
     // (and most likely, from the PDE's preference setting).

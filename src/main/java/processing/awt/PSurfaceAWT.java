@@ -42,18 +42,13 @@ import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.*;
 import java.lang.management.ManagementFactory;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JFrame;
 
-import processing.core.PApplet;
-import processing.core.PConstants;
-import processing.core.PGraphics;
-import processing.core.PImage;
-import processing.core.PSurfaceNone;
+import processing.core.*;
 import processing.event.KeyEvent;
 import processing.event.MouseEvent;
 
@@ -588,21 +583,10 @@ public class PSurfaceAWT extends PSurfaceNone {
   public void setIcon(PImage image) {
     Image awtImage = (Image) image.getNative();
 
-    if (PApplet.platform != PConstants.MACOSX) {
-      frame.setIconImage(awtImage);
-
-    } else {
-      try {
-        final String td = "processing.core.ThinkDifferent";
-        Class<?> thinkDifferent =
-          Thread.currentThread().getContextClassLoader().loadClass(td);
-        Method method =
-          thinkDifferent.getMethod("setIconImage", new Class[] { java.awt.Image.class });
-        method.invoke(null, new Object[] { awtImage });
-      } catch (Exception e) {
-        e.printStackTrace();  // That's unfortunate
-      }
-    }
+	  if (Platform.SUPPORTS_APPLE_EAWT)
+	  	ThinkDifferent.setIconImage(awtImage);
+	  else
+	    frame.setIconImage(awtImage);
   }
 
 
@@ -648,18 +632,9 @@ public class PSurfaceAWT extends PSurfaceNone {
         // On OS X, set this for AWT surfaces, which handles the dock image
         // as well as the cmd-tab image that's shown. Just one size, I guess.
         URL url = PApplet.class.getResource("/icon/icon-512.png");
-        // Seems dangerous to have this in code instead of using reflection, no?
-        //ThinkDifferent.setIconImage(Toolkit.getDefaultToolkit().getImage(url));
-        try {
-          final String td = "processing.core.ThinkDifferent";
-          Class<?> thinkDifferent =
-            Thread.currentThread().getContextClassLoader().loadClass(td);
-          Method method =
-            thinkDifferent.getMethod("setIconImage", new Class[] { java.awt.Image.class });
-          method.invoke(null, new Object[] { Toolkit.getDefaultToolkit().getImage(url) });
-        } catch (Exception e) {
-          e.printStackTrace();  // That's unfortunate
-        }
+
+        if (Platform.SUPPORTS_APPLE_EAWT)
+        	ThinkDifferent.setIconImage(Toolkit.getDefaultToolkit().createImage(url));
       }
     }
   }
