@@ -1158,44 +1158,41 @@ public class PApplet implements PConstants {
       // This should probably be reset each time there's a display change.
       // A 5-minute search didn't turn up any such event in the Java 7 API.
       // Also, should we use the Toolkit associated with the editor window?
-      final String javaVendor = System.getProperty("java.vendor");
-      if (javaVendor.contains("Oracle")) {
-        GraphicsDevice device;
-        GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+      GraphicsDevice device;
+      GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
 
-        if (display == -1) {
-          device = env.getDefaultScreenDevice();
+      if (display == -1) {
+        device = env.getDefaultScreenDevice();
 
-        } else if (display == SPAN) {
-          throw new RuntimeException("displayDensity() only works with specific display numbers");
+      } else if (display == SPAN) {
+        throw new RuntimeException("displayDensity() only works with specific display numbers");
 
+      } else {
+        GraphicsDevice[] devices = env.getScreenDevices();
+        if (display > 0 && display <= devices.length) {
+          device = devices[display - 1];
         } else {
-          GraphicsDevice[] devices = env.getScreenDevices();
-          if (display > 0 && display <= devices.length) {
-            device = devices[display - 1];
+          if (devices.length == 1) {
+            System.err.println("Only one display is currently known, use displayDensity(1).");
           } else {
-            if (devices.length == 1) {
-              System.err.println("Only one display is currently known, use displayDensity(1).");
-            } else {
-              System.err.format("Your displays are numbered %d through %d, " +
-                "pass one of those numbers to displayDensity()%n", 1, devices.length);
-            }
-            throw new RuntimeException("Display " + display + " does not exist.");
+            System.err.format("Your displays are numbered %d through %d, " +
+              "pass one of those numbers to displayDensity()%n", 1, devices.length);
+          }
+          throw new RuntimeException("Display " + display + " does not exist.");
+        }
+      }
+
+      try {
+        Field field = device.getClass().getDeclaredField("scale");
+        if (field != null) {
+          field.setAccessible(true);
+          Object scale = field.get(device);
+
+          if (scale instanceof Integer && ((Integer)scale).intValue() == 2) {
+            return 2;
           }
         }
-
-        try {
-          Field field = device.getClass().getDeclaredField("scale");
-          if (field != null) {
-            field.setAccessible(true);
-            Object scale = field.get(device);
-
-            if (scale instanceof Integer && ((Integer)scale).intValue() == 2) {
-              return 2;
-            }
-          }
-        } catch (Exception ignore) { }
-      }
+      } catch (Exception ignore) { }
     } else if (PApplet.platform == PConstants.WINDOWS ||
         PApplet.platform == PConstants.LINUX) {
       if (suggestedDensity == -1) {
